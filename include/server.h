@@ -25,9 +25,10 @@ public:
     int serverFD;                                                            //Server file Descriptor
     //public methods
     int initServer(unsigned int maxpending, std::string port, std::string ip);  //Initialize values for addrinfo
-    int parseCommand(Client *Client);                                           //Parse data
-    size_t serverSendResponse(Client *Client);                                  //Send Response
-    size_t serverSendHeader(Client *Client);                                    //Send Header
+    int parseCommand(Client *Client);            //Parse data
+    size_t serverSendResponse(Client *Client);  //Send Response
+    size_t serverSendHeader(Client *Client);   //Send Header
+    int cleanup(Client *Client);    //Cleanup Client Context
     void perform();
 
     

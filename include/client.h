@@ -20,9 +20,10 @@ public:
     std::string status;                                 //status of client
     std::string method;                         //method of request  
     std::string path;                           //request path (File request or File upload)
-    std::string version;                        //HTTP Version  
-    char host[NI_MAXHOST];
-    char port[NI_MAXSERV];                  
+    std::string version;                        //HTTP Version 
+    std::string contenType; 
+    char host[NI_MAXHOST];                      //Store client IP here
+    char port[NI_MAXSERV];                      //Store client Port here
     void initClient();
 };
 

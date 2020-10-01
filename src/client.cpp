@@ -6,6 +6,6 @@ void Client::initClient(){
     this->status = "";
     this->method = "";
     this->path = "";
-    this->version = "";
+    this->version = "HTTP/1.1 ";
     memset(&this->clientAddress,0,sizeof(this->clientAddress));
 }
