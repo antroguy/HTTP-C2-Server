@@ -134,7 +134,6 @@ size_t Server::serverSendResponse(Client *Client){
             //Increment byte offset of the file
             offset += bytesRecieved;
             //Send data to client
-            fprintf(stdout,"%s\n",bufferW);
             while((bytesSent = send(Client->clientFD,bufferW,bytesRecieved,0)) != bytesRecieved){
                 bufferOffset +=bytesSent;
                 bytesRecieved = bytesRecieved-bytesSent;
