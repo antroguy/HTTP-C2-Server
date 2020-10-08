@@ -80,7 +80,7 @@ size_t Server::serverSendHeader(Client *Client){
     //FD for image
     int fileFD;
     off_t fileLength = 0;
-    Client->contenType = "image/jpeg";
+    Client->contenType = "image/png";
     if(Client->method == "GET"){
         if((fileFD = open(Client->path.c_str(),O_RDONLY)) == -1){
             fprintf(stdout,"File Not Found: file: %s from client: %s\n",Client->path.c_str(), Client->host);
@@ -213,7 +213,7 @@ void Server::perform(){
             cleanup(clientContext);
             continue;
         }
-        //Send Tree Image
+        //Send Response
         serverSendResponse(clientContext);
         cleanup(clientContext);
 
