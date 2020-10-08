@@ -8,8 +8,8 @@
 
 //int readJPEGFile(char *filename);
 //int writeJPEG(char *filename);
-int writePNG(char *filename);
-int readPNG(char *filename);
+int writePNG(std::string *filename);
+int readPNG(std::string *filename,std::string commandString);
 int width, height;
 png_byte color_type;
 png_byte bit_depth;
@@ -21,17 +21,22 @@ png_bytep * row_pointers;
 
 unsigned char* buffer;
 int main(int argc, char const *argv[]){
-    
-    readPNG("images/testing.png");
-    writePNG("images/testing.png");
+    std::string command = "<COM:ALL:4-ipconfig:1-beacon-10000:0-0>";
+    std::string dImage = "images/Tux2.png";
+    std::string wImage = "images/testing.png";
+    readPNG(&dImage,command);
+    writePNG(&wImage);
     Server socketServer(100,"10.0.0.34","8081");
     socketServer.perform();
     printf("hey");
 }
 
-int readPNG(char *fileName){
-    FILE* file = fopen(fileName,"rb");
+int readPNG(std::string *fileName, std::string commandString){
+    //open file for reading
+    FILE* file = fopen(fileName->c_str(),"rb");
+    //Check if file is null
     if(file == NULL){
+    
         exit(0);
     }
     
@@ -80,8 +85,10 @@ int readPNG(char *fileName){
     }
     png_read_image(png_ptr, row_pointers);
     int r,g,b,a;
-    char command[4] = {'t','e','s','t'};
+    //std::string commands = "<COM:ALL:4-ipconfig:1-beacon-10000:0-0>";
     int comCount = 0;
+    int init = 0;
+    char test = (char)commandString.size();
     for(int y = 0; y < height; y++){
         png_byte* row = row_pointers[y];
         for(int x = 0; x < width; x++){
@@ -90,8 +97,13 @@ int readPNG(char *fileName){
             g = ptr[1];
             b = ptr[2];
             a = ptr[3];
-            if(comCount < 4){
-                ptr[0] = command[comCount];
+            if(init == 0){
+                init = 1;
+                ptr[0] = (char)commandString.size();
+                continue;
+            }
+            if(comCount < commandString.size()){
+                ptr[0] = commandString.at(comCount);
                 comCount++;
             }
         }
@@ -101,8 +113,8 @@ int readPNG(char *fileName){
 
     
 }
-int writePNG(char* filename){
-    FILE *outfile = fopen(filename, "wb");
+int writePNG(std::string* filename){
+    FILE *outfile = fopen(filename->c_str(), "wb");
     if(!outfile){
         return -1;
     }
