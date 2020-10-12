@@ -2,12 +2,13 @@
 #include "server.h"
 #endif
 //Constructor
-Server::Server(unsigned int c_maxpending, std::string port, std::string ip){
-    initServer(maxpending,port,ip );
+Server::Server(unsigned int c_maxpending, std::string port){
+    initServer(maxpending,port);
 }
 //Initialize Server Variables
-int  Server::initServer(unsigned int maxpending, std::string port, std::string ip){
+int Server::initServer(unsigned int maxpending, std::string port){
     this->maxpending = maxpending;
+    this->port = port;
     //Set server,serverInfo  memory to 0, getaddrinfo() will fail without this.
     memset(&this->server,0,sizeof(addrinfo));
     //this->serverInfo = NULL;
@@ -20,9 +21,12 @@ int  Server::initServer(unsigned int maxpending, std::string port, std::string i
     fprintf(stdout, "Server Initialized.........................\n");
 
 }
-//parse header for method
-int Server::parseCommand(Client *Client){
-        char buffer[BUFFER] = {0};
+//recieve and validate header for method
+int Server::recvRequest(Client *Client){
+        //Buffer to hold information
+        char buffer[BUFFER] = {0}; 
+        //Map to store header attributes/values         
+        std::map<std::string,std::string> headermap;
         //Setup polling to detect incoming data
         Client->pfds[0].fd = Client->clientFD;
         Client->pfds[0].events = POLLIN; //There is data to read
@@ -31,52 +35,75 @@ int Server::parseCommand(Client *Client){
         while((pollVal = poll(Client->pfds,1,100)) > 0){
             if(recv(Client->pfds[0].fd,buffer,BUFFER, 0) == -1){
                 fprintf(stdout,"Failed to read from client: Errno: %s\n", strerror(errno));
-                //CLEANUP
+                //NOTE: Implement CLEANUP
             }
         }
-        
-        //Parse the header for Method, Path, and HTTP Version
-        //Convert buffer to a string
-        fprintf(stdout,"Successfully read request header\n");
-        std::string header = buffer;
-        //beginning of iterator
-        int beginning = 0;
-        //token to store substrings in
-        std::vector<std::string> token;
-        //Separate header by5 spaceing
-        for(int end = 0; (end=header.find(" ",end)); ++end){
-            token.push_back(header.substr(beginning,end - beginning));
-            beginning = end +  1;
-            //Only grabe the first three headers
-            if(token.size() == 2){
-                break;
-            }
-        }
-        //Implement this later to ignore favicon.ico https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
-        if(token[1] == "/favicon.ico"){
+        //Validate buffer isnt null, if so ignore request
+        if(strlen(buffer) ==0){
             return -1;
         }
-        //Check status, perform necessary options
-        if(token[0] == "GET"){
-            token[1].erase(token[1].find_first_of('/'),1);
-            Client->method = "GET";
-            Client->path = token[1];
-            fprintf(stdout,"Request method: %s %s from client: %s\n",token[0].c_str(),token[1].c_str(), Client->host);
-            return 0;
-        }else if(token[0] == "POST"){
-            Client->method = "POST";
-            Client->path = token[1];
-            fprintf(stdout,"Request method: %s %s from client: %s\n",token[0].c_str(),token[1].c_str(), Client->host);
-            return 0;
-        }else{
-            fprintf(stdout,"Invalid request method: \"%s\" from client: %s\n",token[0].c_str(), Client->host);
+        //Parse the header for Method, Path, and HTTP Version
+        if(parseHeader(buffer,&headermap)){
+            fprintf(stdout,"Invalid Header: \"%s\" from client: %s\n",headermap.at("Method").c_str(), Client->host);
             Client->status = "400 Bad Request";
             return -1;
         }
-
+        fprintf(stdout,"Successfully read request header\n");
+        //Assign values to header.
+        Client->method = headermap.at("Method");
+        Client->path = Client->path = headermap.at("Path").substr(headermap.at("Path").find("/") + 1,headermap.at("Path").size());
+        //Implement this later to ignore favicon.ico https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests
+        if(Client->path == "favicon.ico"){
+            return -1;
+        }
+        //Validate header
+        fprintf(stdout,"Request method: %s %s from client: %s\n",headermap.at("Method").c_str(),headermap.at("Path").c_str(), Client->host);
+        return 0;
+}
+//Pare header for attributes and values
+int Server::parseHeader(char *buf, std::map<std::string,std::string> *headerMap){
+    std::istringstream resp(buf);       //Input stream for header
+    std::string output;                 //Temmpory string to hold each line of the ehader request
+    int index,prev = 0;                 //Indexs
+    int countInitial =0;                //Used to parse Method, Path, and HTTP Version
+    std::string format[3] = {"Method","Path","Version"};
+    //Extract characters fromt he stream (Delim character is \n by default)
+    while(std::getline(resp,output) && output != "\r"){
+        //If initial, grab Method, Path and HTTP Version
+        if(countInitial == 0){
+            index = output.find(' ', 0);
+            while(index != std::string::npos){
+                headerMap->insert(std::make_pair(format[countInitial], output.substr(prev,index-prev)));
+                prev = index + 1;
+                index = output.find(" ", prev);
+                countInitial++;
+            }
+        //Else grab all other attributes and values
+        }else{
+            index = output.find(':', 0);
+            if(index != std::string::npos){
+                headerMap->insert(std::make_pair(output.substr(0,index),output.substr(index+2, output.length() - index -3)));
+            }
+        }
+    }
+    //Validate header is valid
+    try{
+        if(headerMap->empty()){
+            return -1;
+        }   
+        if(headerMap->at("Method") != "GET" && "POST"){
+            return -1;
+        }
+        if(headerMap->at("Path") == ""){
+            return -1;
+        }
+    }catch (const std::out_of_range error){
+        return -1;
+    }
+    return 0;
 }
 //send header
-size_t Server::serverSendHeader(Client *Client){
+int Server::serverSendHeader(Client *Client){
     //FD for image
     int fileFD;
     off_t fileLength = 0;
@@ -102,21 +129,22 @@ size_t Server::serverSendHeader(Client *Client){
         }
         //Send header
         fprintf(stdout,"Header Sent to client: %s\n", Client->host);
-        std::string message = Client->version + Client->status + "\nContent-Type: " + Client->contenType + "\nContent-Length: " + std::to_string(fileLength) + "\r\n\r\n";
+        std::string message = Client->version + Client->status + "\r\nContent-Type: " + Client->contenType + "\r\nContent-Length: " + std::to_string(fileLength) + "\r\n\r\n";
         //std::string test = "HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: 146782\n\n";
         send(Client->clientFD, message.c_str(),message.length(),0);
         fprintf(stdout,"%s",message.c_str());
         return 0;
+    //Will Implement this Feature Later
     }else if(Client->method == "PUT"){
         fprintf(stdout,"Header Sent to client: %s\n", Client->host);
         std::string message = Client->version + Client->status + "\r\n\r\n";
         send(Client->clientFD, message.c_str(),message.length(),0);
-        return -1;
+        return 0;
     }
 
 }
 //Send data back to client
-size_t Server::serverSendResponse(Client *Client){
+int Server::serverSendBody(Client *Client){
         if(Client->status == "404 Not Found"){
             send(Client->clientFD,Client->status.c_str(),sizeof(Client->status.c_str()),0);
             return 0;
@@ -150,6 +178,7 @@ size_t Server::serverSendResponse(Client *Client){
         close(Client->clientFD);
         return 0;
 }
+//Cleanup (Need to implement more later)
 int Server::cleanup(Client *Client){
     close(Client->clientFD);
     delete(Client);
@@ -157,7 +186,7 @@ int Server::cleanup(Client *Client){
 //Perform certain functions
 void Server::perform(){
     int status;
-    if((status = getaddrinfo(NULL,"8080",&this->server,&this->serverInfo)) != 0){
+    if((status = getaddrinfo(NULL,this->port.c_str(),&this->server,&this->serverInfo)) != 0){
         printf("Failed to get addr info");
         std::exit(EXIT_FAILURE);
     }
@@ -196,27 +225,27 @@ void Server::perform(){
             //Continue
             continue;
         }
+        //Get Client Address
         if(getnameinfo((struct sockaddr *)&clientContext->clientAddress,sizeof(sockaddr_storage),clientContext->host,sizeof(clientContext->host),clientContext->port,sizeof(clientContext->port),NI_NUMERICHOST | NI_NUMERICSERV) != 0){
             fprintf(stdout,"Failed to get Client Address");
         }
         //Parse header for command
-        if((parseCommand(clientContext)) == -1){
+        if((recvRequest(clientContext)) == -1){
             serverSendHeader(clientContext);
             cleanup(clientContext);
             continue;
         }
-        //Check if file exists
-        
-        //Send Header
+        //Generate Request
         if(serverSendHeader(clientContext) == -1){
             //Cleanup
             cleanup(clientContext);
             continue;
         }
         //Send Response
-        serverSendResponse(clientContext);
+        if(clientContext->method == "GET"){
+            serverSendBody(clientContext);
+        }
         cleanup(clientContext);
-
     }
 
 

@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <vector>
+#include <map>
+#include <sstream>
 
 #define BUFFER 4096
 
@@ -21,14 +23,16 @@ private:
     int option_value;                       //Option value will be set to 1 to set REUSEADDR for SO_Socket
 
 public:
-    Server(unsigned int maxpending, std::string port, std::string ip);       //Constructor
+    std::string port;
+    Server(unsigned int maxpending, std::string port);       //Constructor
     int serverFD;                                                            //Server file Descriptor
     //public methods
-    int initServer(unsigned int maxpending, std::string port, std::string ip);  //Initialize values for addrinfo
-    int parseCommand(Client *Client);            //Parse data
-    size_t serverSendResponse(Client *Client);  //Send Response
-    size_t serverSendHeader(Client *Client);   //Send Header
-    int cleanup(Client *Client);    //Cleanup Client Context
+    int initServer(unsigned int maxpending, std::string port);  //Initialize values for addrinfo
+    int recvRequest(Client *Client);                                           //Recieve Header Request
+    int parseHeader(char * buf, std::map<std::string,std::string> *headerMap);  //parseHeader
+    int serverSendBody(Client *Client);                                         //Send Response Body
+    int serverSendHeader(Client *Client);                                        //Send Header
+    int cleanup(Client *Client);                                                 //Cleanup Client Context
     void perform();
 
     
