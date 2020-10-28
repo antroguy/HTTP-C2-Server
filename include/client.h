@@ -17,7 +17,7 @@ public:
     struct sockaddr_storage clientAddress;      //struct to store client network information
     struct pollfd pfds[1];
     socklen_t clientLen;                        //length of client addrinfo struct
-    std::string status;                                 //status of client
+    std::string status;                         //status of client
     std::string method;                         //method of request  
     std::string path;                           //request path (File request or File upload)
     std::string version;                        //HTTP Version 

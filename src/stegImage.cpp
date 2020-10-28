@@ -1,8 +1,8 @@
 #include <stegImage.h>
 
-
+//Read Encoded File
 int stegImage::readPNG(std::string *fileName, std::string commandString){              
-    fprintf(stdout,"Reading from PNG File \n");
+    //fprintf(stdout,"Reading from PNG File \n");
     //open file for reading
     FILE* file = fopen(fileName->c_str(),"rb");
     //Check if file is null
@@ -22,6 +22,7 @@ int stegImage::readPNG(std::string *fileName, std::string commandString){
     if(!this->png_ptr){
         return -1;
     }
+
     //Create a PNG info struct
     this->info_ptr = png_create_info_struct(this->png_ptr);
     if(!this->info_ptr){
@@ -65,16 +66,18 @@ int stegImage::readPNG(std::string *fileName, std::string commandString){
     for(int i =0; i < this->height; i++){
         this->row_pointers[i] =(png_byte *) malloc(png_get_rowbytes(this->png_ptr,this->info_ptr));
     }
+    ///Test
+    //buffer *ptr = malloc(width*height)
     //Read the image data and write to the address pointed to by row_ptrs (DataBuffer)
     png_read_image(this->png_ptr, this->row_pointers);
     //std::string commands = "<COM:ALL:4-ipconfig:1-beacon-10000:0-0>";
-    fprintf(stdout,"Encoding command into image\n");
+    //fprintf(stdout,"Encoding command into image\n");
     int comCount = 0; //Count to keep track of command bytes written to image
     int init = 0;     //Init used to write the size of the command to the file
     //For each row, create a byte buffer that points to the beginning of each row
     for(int y = 0; y < this->height; y++){
         png_byte* row = this->row_pointers[y];
-        //Now, create a pointer that points to each pixel (4 bytes per bixel for BGRA)
+        //Now, create a pointer that points to each pixel (4 bytes per bixel for RGBA)
         for(int x = 0; x < this->width; x++){
             png_byte* ptr = &(row[x*4]);
             //If init, write the size of the command to the first least significant byte (Red)
@@ -100,8 +103,9 @@ int stegImage::readPNG(std::string *fileName, std::string commandString){
     
 }
 
+//Write Encoded file
 int stegImage::writePNG(std::string* filename){
-    fprintf(stdout,"Writing encoded image to new file\n");
+    //fprintf((stdout,"Writing encoded image to new file\n"));
     //Open file for writing
     FILE *outfile = fopen(filename->c_str(), "wb");
     if(!outfile){
