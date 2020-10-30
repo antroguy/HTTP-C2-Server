@@ -4,6 +4,7 @@
             if(cliInstance->input[1] == "ID"){
                 cliInstance->id = cliInstance->input[2];
             }else if(cliInstance->input[1] == "EXEC"){
+                //For statement to store entire command in EXEC.
                 for (int i = 2; i <= cliInstance->input.size(); i++){
                   cliInstance->Exec += cliInstance->input[i] + " ";
                 }

@@ -7,7 +7,6 @@
 
 #endif
 
-
 static struct option gLongOptions[] = {
     {"port", required_argument, NULL, 'p'},
     {"threads", required_argument, NULL, 't'},
