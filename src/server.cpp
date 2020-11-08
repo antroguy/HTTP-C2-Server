@@ -53,8 +53,50 @@ Server::Status Server::recvRequest(Client *Client){
         //Assign values to header.
         Client->method = headermap.at("Method");
         Client->path = headermap.at("Path").substr(headermap.at("Path").find("/") + 1,headermap.at("Path").size());
-        //Validate header
+        //If Post request, need to process additional data upload
+        if(Client->method == "POST"){
+            //Set seed for new number
+            srand(time(NULL));
+            //Create random file for processing
+            std::string dir = Client->path + "/" + std::to_string(rand()) + ".png";
+            //Lock
+            mapMutex.lock();
+            //Open file for writing
+            FILE *file = fopen(dir.c_str(), "wb");
+            //Update Map
+          
+            if(file == nullptr){
+                return Status::STATUS_ERROR;
+            }
+            fileMap.insert(std::make_pair(dir,1));
+            mapMutex.unlock();
+            //Temp Buffer 
+            char *recvBuff = (char *)malloc(sizeof(char) * BUFFER);
+            //Keep track of bytes recieved
+            int bytesRecieved = 0;
+            int result = 0;
+            while(bytesRecieved < atoi(headermap.at("Content-Length").c_str())){
+                if((result = recv(Client->clientFD,recvBuff,BUFFER,0)) == -1 ){
+                        break;
+                }
+                fwrite(recvBuff,1,result,file);
+                bytesRecieved += result;
+            }
+            if(bytesRecieved != atoi(headermap.at("Content-Length").c_str())){
+                fclose(file);
+                free(recvBuff);
+                remove(dir.c_str());
+                return Status::STATUS_ERROR;
+            }
+            fclose(file);
+            free(recvBuff);
+            mapMutex.lock();
+            fileMap.find(dir)->second = 0;
+            mapMutex.unlock();
+            fileCond.notify_all();
 
+
+        }
         //Check if default Path
         if(Client->path ==DEFAULT_PATH){
             fprintf(stdout,"Client %s has initiated connection\n", Client->host);
@@ -95,8 +137,13 @@ Server::Status Server::parseHeader(char *buf, std::map<std::string,std::string> 
             return Status::STATUS_INVALID_REQUEST;
         }   
         //Check for valid method
-        if(headerMap->at("Method") != "GET" && "POST"){
+        if(headerMap->at("Method") != "GET" && headerMap->at("Method") !="POST"){
             return Status::STATUS_INVALID_REQUEST;
+        }
+        if(headerMap->at("Method") == "POST"){
+            if(headerMap->at("Content-Length").empty()){
+              return Status::STATUS_INVALID_REQUEST;
+            }
         }
         //Check if path is empty
         if(headerMap->at("Path") == ""){
@@ -113,6 +160,7 @@ Server::Status Server::serverSendHeader(Client *Client){
     //FD for image
     int fileFD;
     off_t fileLength = 0;
+    std::string message;
     //If invalid header recieved, send back response
     if(Client->status == statResp.Status_400){
         Client->status = statResp.Status_400;
@@ -139,16 +187,23 @@ Server::Status Server::serverSendHeader(Client *Client){
             //Set request status
             Client->status = statResp.Status_200;
         }
+        message = Client->version + Client->status + "\r\nContent-Type: " + Client->contenType + "\r\nContent-Length: " + std::to_string(fileLength) + "\r\n\r\n";
+        //std::string test = "HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: 146782\n\n";
+        if(send(Client->clientFD, message.c_str(),message.length(),0) == -1){
+            DEBUG_PRINT((stdout,"%Error sending header: Errno - %s\n",strerror(errno)));
+            return Status::STATUS_ERROR;
+        }
     //Will Implement this Feature Later
-    }else if(Client->method == "PUT"){
-        //DoSomthing
+    }else if(Client->method == "POST"){
+        Client->status = statResp.Status_201;
+        message = Client->version + Client->status + "\r\n\r\n";
+        //std::string test = "HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: 146782\n\n";
+        if(send(Client->clientFD, message.c_str(),message.length(),0) == -1){
+            DEBUG_PRINT((stdout,"%Error sending header: Errno - %s\n",strerror(errno)));
+            return Status::STATUS_ERROR;
+        }
     }
-    std::string message = Client->version + Client->status + "\r\nContent-Type: " + Client->contenType + "\r\nContent-Length: " + std::to_string(fileLength) + "\r\n\r\n";
-    //std::string test = "HTTP/1.1 200 OK\nContent-Type: image/jpeg\nContent-Length: 146782\n\n";
-    if(send(Client->clientFD, message.c_str(),message.length(),0) == -1){
-        DEBUG_PRINT((stdout,"%Error sending header: Errno - %s\n",strerror(errno)));
-        return Status::STATUS_ERROR;
-    }
+
         //Send header
     DEBUG_PRINT((stdout,"%s\n",message.c_str()));
     return Status::STATUS_OK;
@@ -207,7 +262,7 @@ Server::Status Server::serverSendBody(Client *Client){
         close(Client->clientFD);
         return Status::STATUS_OK;
     }
-    else if(Client->status == "PUT"){
+    else if(Client->status == "POST"){
         return Status::STATUS_OK;
     }
     return Status::STATUS_ERROR;

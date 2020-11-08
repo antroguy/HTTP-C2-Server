@@ -19,8 +19,10 @@ private:
 public:
 
     int writePNG(std::string *filename);                                //Write PNG file (Encode data buffer into PNG file)
-    int readPNG(std::string *filename,std::string commandString);       //Read PNG file (Decode it, write command to it)
-    int cleanup();                                                      //Cleanup operation
+    int readPNG(std::string *filename);       //Read PNG file (Decode it, write command to it)
+    int encodeImage(std::string commandString); //Encode image with command
+    int decodeImage(std::string *output);       //output to grab from client
+    int cleanup();                              //Cleanup operation
 };
 
 
