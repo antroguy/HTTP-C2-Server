@@ -49,10 +49,10 @@ private:
     struct addrinfo *serverInfo;            //Used to point to results
     int option_value;                       //Option value will be set to 1 to set REUSEADDR for SO_Socket
     std::string  headerFormat[3] = {"Method","Path","Version"};  //format of expected header. Used to parse header GET Request   
-    enum class Status {STATUS_OK, STATUS_ERROR, STATUS_INVALID_REQUEST, STATUS_FILE_NOT_FOUND};
     statusResponse statResp;
 
 public:
+    enum class Status {STATUS_OK, STATUS_ERROR, STATUS_INVALID_REQUEST, STATUS_FILE_NOT_FOUND};
     std::string port;
     Server(unsigned int maxpending, std::string port);                       
     int serverFD;                                                            //Server file Descriptor
@@ -64,6 +64,7 @@ public:
     Status serverSendHeader(Client *Client);                                        //Send Header
     void cleanup(Client *Client);                                                 //Cleanup Client Context
     void perform();
+    Status serverHandler();
 
     
     

