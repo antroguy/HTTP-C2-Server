@@ -20,6 +20,13 @@ HTTPS Server Commands
 * Add multithreading capabilities for processing multiple requests. Currently only one request can be processed at a time from a single client. 
 * Ability to alter URL that C2 clients will reach back to.
 * Ability to upload any RGBA file for encoding/decoding messages. (Current default image is default.png)
+* Create Dockers for both the Server/Client for easy deployment/compilation.
+
+### Requirements
+# Server
+* Server has only been tested on Ubuntu 18.04 LT
+# Client
+* Client has only been tested on Windows 10/2016
 
 ### Disclaimer
 Code samples for the C2 Server are provided for educational purposes. Adequate defenses can only be built by researching attack techniques available to malicious actors. Using this code against target systems without prior permission is illegal in most jurisdictions. The author is not liable for any damages from misuse of this information or code.
