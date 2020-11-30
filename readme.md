@@ -16,10 +16,13 @@ From here you can type "show" in order to show all the options available.
 
 The commands that are available are as follows:
 
-**set:**  Set an option value
-**show:** Show all options
-**bots:** Show all active clients and their IDs
-**run:**  Generate an encoded PNG image with the corresponding option commands. 
+* **set:**  Set an option value
+
+* **show:** Show all options
+
+* **bots:** Show all active clients and their IDs
+
+* **run:**  Generate an encoded PNG image with the corresponding option commands. 
 
 Lets go over the available options real quick.
 
