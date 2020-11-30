@@ -30,7 +30,7 @@ Lets go over the available options real quick.
    * Example: "Set KILL True".
  
 * **CONF** - Modify the variable of a client. The only supported variable at this time is beacon. To set the beacon time (How frequently the client reaches back to the server for commands), you will need to run the command "set CONF beacon-20000", where the variable 20000 is in milliseconds.
- * Example: "Set CONF beacon-100"
+  * Example: "Set CONF beacon-100"
 
 * **EXEC** - Set the command to be executed on the client. This is a way to issue commands to the clients without establishing a remote shell.
  * Example: "Set EXEC ipconfig".
