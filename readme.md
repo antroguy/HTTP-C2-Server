@@ -105,6 +105,7 @@ HTTPS Server Commands
 * Ability to upload any RGBA file for encoding/decoding messages. (Current default image is default.png)
 * Create Dockers for both the Server/Client for easy deployment/compilation.
 * Allow command line arguments to specify port and host address to bind to.
+* Incorporate Asynchronous sockets for the Remote Shell instead of using synchronous (This was a big mistake i need to fix)
 
 ### Requirements
 #### Server
