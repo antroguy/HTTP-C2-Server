@@ -27,7 +27,7 @@ The commands that are available are as follows:
 Lets go over the available options real quick.
 
 * **KILL** - This can be set to True or left blank. If True, the client will terminate the process after completing all the commands issued by the server. 
- ** Example: "Set KILL True".
+   * Example: "Set KILL True".
  
 * **CONF** - Modify the variable of a client. The only supported variable at this time is beacon. To set the beacon time (How frequently the client reaches back to the server for commands), you will need to run the command "set CONF beacon-20000", where the variable 20000 is in milliseconds.
  * Example: "Set CONF beacon-100"
