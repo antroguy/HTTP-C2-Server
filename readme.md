@@ -1,6 +1,19 @@
 ### Summary
 The HTTPS C2 Server is a C2 framework that utilizes PNG images to establish command and control to deployed clients. I did this strictly for educational purposes in order to gain an understanding of how to develop C2 servers/clients at the system API level, as well as better prepare myself to defend agaisnt malicious threat actors. The C2 server was developed on Ubuntu and the C2 client was developed for Windows 10 OS. Both the C2 server and client were deveveloped in C++. Be aware that this is my first attempt at developing a project in C++, don't expect expert level code! XD
 
+### QuickStart
+1. First clone the HTTPS-C2-Server repository from a Ubuntu VM:
+```
+$ git clone https://github.com/antroguy/HTTPS-C2-Server
+```
+2. Go to HTTPS-C2-Server/build and run the following command to start the server. The default port is 8080. A future update will allow you to specify the port and host address to bind. 
+```
+$ ./serverMain
+```
+From here you can type "show" in order to show all the options and commands available to you. 
+
+View the following link to see the flow of the program. 
+
 [HTTPS-C2-Program-Flow](https://github.com/antroguy/HTTPS-C2-Server/tree/master/Documentation/C2_HTTPS_Program_Flow.pdf)
 
 ### Features
@@ -21,6 +34,7 @@ HTTPS Server Commands
 * Ability to alter URL that C2 clients will reach back to.
 * Ability to upload any RGBA file for encoding/decoding messages. (Current default image is default.png)
 * Create Dockers for both the Server/Client for easy deployment/compilation.
+* Allow command line arguments to specify port and host address to bind to.
 
 ### Requirements
 #### Server
