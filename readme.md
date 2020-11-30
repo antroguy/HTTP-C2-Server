@@ -10,7 +10,19 @@ $ git clone https://github.com/antroguy/HTTPS-C2-Server
 ```
 $ ./serverMain
 ```
-From here you can type "show" in order to show all the options and commands available to you. 
+From here you can type "show" in order to show all the options available.
+
+![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Show-Command.PNG
+
+The commands that are available are 
+Lets go over the options real quick.
+
+**KILL** - This can be set to True or left blank. If True, the client will terminate the process after completing all the commands issued by the server. Example: "Set KILL True".
+_CONF - Modify the variable of a client. The only supported variable at this time is beacon. To set the beacon time (How frequently the client reaches back to the server for commands), you will need to run the command "set CONF beacon-20000", where the variable 20000 is in milliseconds. 
+_EXEC - Set the command to be executed on the client. This is a way to issue commands to the clients without establishing a remote shell.For Example: "Set EXEC ipconfig".
+_UPLOAD - Upload a file to the clients. Here you will need to set the full path of the file you want the clients to download. For Example: "Set UPLOAD /tmp/netcat"
+_ID - Set the ID of the client you want to run the command. This can either be set to "ALL", for which every single client will process the commands, or you can set the ID to the ID number of a connected client. To see the IDs of all connected clients issue the command "bots". Example: "Set ID ALL" OR "Set ID 0".
+_SHELL - Establish a remote shell to a client. For this option you will be setting the port that you want the client to connect to. Example: "Set SHELL 8888".
 
 View the following link to see the flow of the program. 
 
