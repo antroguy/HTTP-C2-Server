@@ -24,18 +24,17 @@ The commands that are available are as follows:
 Lets go over the available options real quick.
 
 **KILL** - This can be set to True or left blank. If True, the client will terminate the process after completing all the commands issued by the server. 
-
- *Example: "Set KILL True".
+ * Example: "Set KILL True".
 **CONF** - Modify the variable of a client. The only supported variable at this time is beacon. To set the beacon time (How frequently the client reaches back to the server for commands), you will need to run the command "set CONF beacon-20000", where the variable 20000 is in milliseconds.
- *Example: "Set CONF beacon-100"
+ * Example: "Set CONF beacon-100"
 **EXEC** - Set the command to be executed on the client. This is a way to issue commands to the clients without establishing a remote shell.
- *Example: "Set EXEC ipconfig".
+ * Example: "Set EXEC ipconfig".
 **UPLOAD** - Upload a file to the clients. Here you will need to set the full path of the file you want the clients to download.
- *Example: "Set UPLOAD /tmp/netcat"
+ * Example: "Set UPLOAD /tmp/netcat"
 **ID** - Set the ID of the client you want to run the command. This can either be set to "ALL", for which every single client will process the commands, or you can set the ID to the ID number of a connected client. To see the IDs of all connected clients issue the command "bots".
- *Example: "Set ID ALL" OR "Set ID 0".
+ * Example: "Set ID ALL" OR "Set ID 0".
 **SHELL** - Establish a remote shell to a client. For this option you will be setting the port that you want the client to connect to.
- *Example: "Set SHELL 8888".
+ * Example: "Set SHELL 8888".
 
 View the following link to see the flow of the program. 
 
