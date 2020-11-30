@@ -50,27 +50,27 @@ Lets go over the available options real quick.
 
 Once your server is up and running you will need to execute the C2-Client executeable on a windows device. First compile the Windows C2 client with the server IP modified to your hosts IP. Once you run the executeable on the compromised machine you should see the C2 client perform it's initiation sequence (Provides the server with it's unique Client ID).
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Client_Connection.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Client_Connection.PNG)
 
 If you type in the command "bots", the server will display all active bots with their ID number. For example, in the image below, if you wanted to issue a command that only bot "A8E5E45D06555A-DESKTOP-71HBDL1" processed, you would need to set the ID option to "0".
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Bots_Command.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Bots_Command.PNG)
 
 For this example we will grab the ip configuration of the compromised host shown above. We will need to set the ID option as well as the EXEC option to the command we want to run. We will also sec the beacon timespan to 20 seconds. See example below.
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Example_1.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Example_1.PNG)
 
 Once the options are set, issue the command "run". This will encode an image with the desired commands. The client will fetch the image, decode the image for the specified commands, run the commands, encode the output into an image, and send the encoded image back to the server. The server will then decode the image, grab the output from the client, and display it on the terminal.
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Output_Example.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Output_Example.PNG)
 
 If we wanted to establish a remote shell to the compromised host we would need to set the SHELL option to the designated port we want the client to connect to. The ID option can not be set to "ALL" when establishin a remote shell, instead only one unique ID must be set. 
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example.PNG)
 
 Once ready type in the "run" command. A handler will be setup on the designated port waiting for the clients incoming connection. Once you are done witht he shell, simply type "exit" into the terminal to exit the remote session. 
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example2.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example2.PNG)
 
 If you want to terminate all active clients, simply set the KILL option to "True" and the ID option to "ALL" and run.
 
