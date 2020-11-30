@@ -52,11 +52,11 @@ Lets go over the available options real quick.
 * **SHELL** - Establish a remote shell to a client. For this option you will be setting the port that you want the client to connect to.
   * Example: "set SHELL 8888".
 
-Once your server is up and running you will need to execute the C2-Client executable on a windows device. First compile the Windows C2 client with the server IP modified to your hosts IP. Once you run the executable on the compromised machine you should see the C2 client perform it's initiation sequence (Provides the server with its unique Client ID).
+Once your server is up and running you will need to execute the C2-Client executable on a windows device. First compile the Windows C2 client with your designated server IP. Once you run the executable on the compromised machine you should see the C2 client perform it's initiation sequence (Provides the server with its unique Client ID).
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Client_Connection.PNG)
 
-If you type in the command "bots", the server will display all active bots with their ID number. For example, in the image below, if you wanted to issue a command that only bot "A8E5E45D06555A-DESKTOP-71HBDL1" processed, you would need to set the ID option to "0".
+If you type in the command "bots", the server will display all active bots with their ID number. For example, in the image below, if you wanted to issue a command that only bot "A8E5E45D06555A-DESKTOP-71HBDL1" processes, you would need to set the ID option to "0".
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Bots_Command.PNG)
 
