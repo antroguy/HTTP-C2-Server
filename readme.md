@@ -16,7 +16,7 @@ $ ./serverMain
 ```
 From here you can type "show" in order to show all the options available.
 
-![alt text] https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Show-Command.PNG
+![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Show-Command.PNG)
 
 The commands that are available are as follows:
 
