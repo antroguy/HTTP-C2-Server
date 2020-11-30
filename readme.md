@@ -108,7 +108,8 @@ HTTPS Server Commands
 
 ### Requirements
 #### Server
-* Server has only been tested on Ubuntu 18.04 LT
+* libpng-dev
+* Ubuntu 18.04 (May work on other linux distributions, but only been tested on Ubuntu).
 #### Client
 * Client has only been tested on Windows 10/2016
 
