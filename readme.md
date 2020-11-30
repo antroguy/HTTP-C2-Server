@@ -14,7 +14,13 @@ First clone the HTTPS-C2-Server repository from a Ubuntu VM:
 ```
 $ git clone https://github.com/antroguy/HTTPS-C2-Server
 ```
-Go to HTTPS-C2-Server/build and run the following command to start the server. The default port is 8080. A future update will allow you to specify the port and host address to bind.
+If at this point you have not installed libpng-dev, run the following command.
+```
+$ sudo apt install libpng-dev
+```
+Next, from the HTTPS-C2-Server directory run the command "cmake .".Once complete, run the command "make" to compile the servers source code. 
+
+From the working directory run the following command to start the server. The default port is 8080. A future update will allow you to specify the port and host address to bind.
 ```
 $ ./serverMain
 ```
