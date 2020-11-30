@@ -111,7 +111,8 @@ HTTPS Server Commands
 * libpng-dev
 * Ubuntu 18.04 (May work on other linux distributions, but only been tested on Ubuntu).
 #### Client
-* Client has only been tested on Windows 10/2016
+* Windows 10 OS
+* Recommended to compile this from Visual Studio Code 2019. See Client for more details
 
 ### Disclaimer
 Code samples for the C2 Server are provided for educational purposes. Adequate defenses can only be built by researching attack techniques available to malicious actors. Using this code against target systems without prior permission is illegal in most jurisdictions. The author is not liable for any damages from misuse of this information or code.
