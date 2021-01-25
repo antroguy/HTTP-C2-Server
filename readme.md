@@ -5,7 +5,7 @@ The program flow itself is simple. When a host is compromised with the HTTP-C2-C
 
 View the following link to see the flow of the program. 
 
-[HTTPS-C2-Program-Flow](https://github.com/antroguy/HTTPS-C2-Server/tree/master/Documentation/C2_HTTPS_Program_Flow.pdf)
+[HTTP-C2-Program-Flow](https://github.com/antroguy/HTTPS-C2-Server/tree/master/Documentation/C2_HTTPS_Program_Flow.pdf)
 
 I decided to use BGRA (Blue-Green-Red-Alpha) formatted PNG images for C2 for this project. I initially tried to use JPG images to hide C2 commands and data, however after a lot of issues and further research I realized that the JPG compression algorithm is lossy, meaning you lose portions of the raw data during compression. I quickly switched to using PNG images which generally use lossless compression algorithms. BGRA PNG images consist of 32-bit pixels, 8 bits for each color/alpha channel. All commands and data are stored in the LSB of the red pixels. I could have probably stored the data in the alpha pixel, however storing the data in the red pixel bits showed no real visual change to the images.
 
