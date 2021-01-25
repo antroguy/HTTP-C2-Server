@@ -12,15 +12,15 @@ I decided to use BGRA (Blue-Green-Red-Alpha) formatted PNG images for C2 for thi
 This project is by no means complete and will require future updates before it is fully functional (E.G. Not ready for official use). 
 
 ### QuickStart
-First clone the HTTPS-C2-Server repository from a Ubuntu VM:
+First clone the HTTP-C2-Server repository from a Ubuntu VM:
 ```
-$ git clone https://github.com/antroguy/HTTPS-C2-Server
+$ git clone https://github.com/antroguy/HTTP-C2-Server
 ```
 If at this point you have not installed libpng-dev, run the following command.
 ```
 $ sudo apt install libpng-dev
 ```
-Next, from the HTTPS-C2-Server directory run the command "cmake .".Once complete, run the command "make" to compile the servers source code. 
+Next, from the HTTP-C2-Server directory run the command "cmake .".Once complete, run the command "make" to compile the servers source code. 
 
 From the working directory run the following command to start the server. The default port is 8080. A future update will allow you to specify the port and host address to bind.
 ```
@@ -28,7 +28,7 @@ $ ./serverMain
 ```
 From here you can type "show" to show all the options available.
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Show-Command.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Show-Command.PNG)
 
 The commands that are available are as follows:
 
@@ -62,34 +62,34 @@ Lets go over the available options real quick.
 
 Once your server is up and running you will need to execute the C2-Client executable on a windows device. First compile the Windows C2 client with your designated server IP. Once you run the executable on the compromised machine you should see the C2 client perform it's initiation sequence (Provides the server with its unique Client ID).
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Client_Connection.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Client_Connection.PNG)
 
 If you type in the command "bots", the server will display all active bots with their ID number. For example, in the image below, if you wanted to issue a command that only bot "A8E5E45D06555A-DESKTOP-71HBDL1" processes, you would need to set the ID option to "0".
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Bots_Command.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Bots_Command.PNG)
 
 For this example, we will grab the IP configuration of the compromised host shown above. We will need to set the ID option as well as the EXEC option to the command we want to run. We will also set the beacon timespan to 20 seconds. See example below.
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Example_1.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Example_1.PNG)
 
 Once the options are set, issue the command "run". This will encode an image with the desired commands. The client will fetch the image, decode the image for the specified commands, run the commands, encode the output into an image, and send the encoded image back to the server. The server will then decode the image, grab the output from the client, and display it on the terminal.
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Output_Example.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Output_Example.PNG)
 
 If we wanted to establish a remote shell to the compromised host, we will need to set the SHELL option to the designated port we want the client to connect to. The ID option cannot be set to "ALL" when establishing a remote shell, instead only one unique ID must be set. 
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Shell_Example.PNG)
 
 Once ready type in the "run" command. A handler will be setup on the designated port waiting for the clients incoming connection. Once you are done with the shell, simply type "exit" into the terminal to exit the remote session. 
 
-![alt text](https://github.com/antroguy/HTTPS-C2-Server/blob/master/Documentation/Shell_Example2.PNG)
+![alt text](https://github.com/antroguy/HTTP-C2-Server/blob/master/Documentation/Shell_Example2.PNG)
 
 If you want to terminate all active clients, simply set the KILL option to "True" and the ID option to "ALL" and run.
 
 As stated previously this is my first draft of the project and requires a lot of code cleanup and much further development. Feel free to view the source code to gain an understanding of what I have done. I am open to all constructive criticism and feedback, thank you! 
 
 ### Features
-HTTPS Server Commands
+HTTP Server Commands
 * ID   - Sets the ID of the BOT for which the command is meant. The ID can be set to "ALL" or the actual String ID sent to the server from the client. 
 * KILL - Tells the client to kill itself. Future update will incorporate self-deletion/cleanup.
 * CONF - Sets a configuration variable on the client. Acceptable parameters to change are “url” or “beacon”.
@@ -98,7 +98,7 @@ HTTPS Server Commands
 * UPLOAD - Server uploads a specified file to the client. (Currently un-encrypted)
 
 ### Future Updates
-* Incorporate SSL encryption into HTTPS POST/GET requests. Currently HTTP is being utilized.
+* Incorporate SSL encryption into HTTP POST/GET requests. Currently HTTP is being utilized.
 * Add command "DOWNLOAD" - Server will be able to download data from a client via an encrypted channel. 
 * Modify command "UPLOAD" - Incorporate Encryption
 * Modify command "KILL" - Incorporate process self-deletion/cleanup
@@ -116,6 +116,6 @@ HTTPS Server Commands
 #### Client
 * Windows 10 OS
 * Recommended to compile this from Visual Studio Code 2019. See Client for more details
-* https://github.com/antroguy/HTTPS-C2-Client/blob/master/readme.md
+* https://github.com/antroguy/HTTP-C2-Client/blob/master/readme.md
 ### Disclaimer
 Code samples for the C2 Server are provided for educational purposes. Adequate defenses can only be built by researching attack techniques available to malicious actors. Using this code against target systems without prior permission is illegal in most jurisdictions. The author is not liable for any damages from misuse of this information or code.
