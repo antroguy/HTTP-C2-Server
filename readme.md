@@ -51,8 +51,8 @@ Lets go over the available options real quick.
 * **EXEC** - Set the command to be executed on the client. This is a way to issue commands to the clients without establishing a remote shell.
   * Example: "set EXEC ipconfig".
  
-* **UPLOAD** - Upload a file to the clients. Here you will need to set the full path of the file you want the clients to download.
-  * Example: "set UPLOAD /tmp/netcat"
+* **UPLOAD** - Upload a file to the clients. Here you will need to ensure the file you want to upload is in the /fileUploads directory.
+  * Example: "set UPLOAD netcat"
 
 * **ID** - Set the ID of the client you want to run the command. This can either be set to "ALL", for which every single client will process the commands, or you can set the ID to the ID number of a connected client. To see the IDs of all connected clients, issue the command "bots".
   * Example: "set ID ALL" OR "Set ID 0".
